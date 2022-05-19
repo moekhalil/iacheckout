@@ -9,10 +9,18 @@ function bToRoundedMB(b: number) {
   return Math.round((b / 1e6) * 100) / 100;
 }
 
+function bToRoundedMb(b: number) {
+  return Math.round((b / 125000) * 100) / 100;
+}
+
+function secondsToTimeString(seconds: number) {
+  return new Date(seconds * 1000).toISOString().substring(11, 19);
+}
+
 interface ProgressValue {
   done: number;
   eta: number;
-  complete: boolean;
+  rate: number;
 }
 
 interface ItemFileMetadata {
@@ -88,12 +96,11 @@ async function main() {
     `bytes=${lastByte + 1}-${lastByte + (length % (chunkCount - 1))}`
   );
 
-  console.log(`Downloading ${filename}...`);
+  console.log(`Downloading ${filename} (${bToRoundedMB(length)} MB)...`);
 
   const progressBar = new cliProgress.SingleBar(
     {
-      format:
-        "[{bar}] {percentage}% | ETA: {maxEta}s | {value} / {total}MB | {completedChunks}/{chunkCount} parts",
+      format: "[{bar}] {percentage}% | ETA: {maxEta} | {rate} Mbps",
       fps: 5,
       hideCursor: true,
     },
@@ -101,9 +108,8 @@ async function main() {
   );
 
   progressBar.start(bToRoundedMB(length), 0, {
-    maxEta: "N/A",
-    chunkCount,
-    completedChunks: 0,
+    maxEta: "∞",
+    rate: 0,
   });
 
   const chunkResponses = rangeValues.map((range) =>
@@ -116,16 +122,22 @@ async function main() {
     new Progress(res, { throttle: 500 }).on("progress", (p) => {
       progressValues[i] = {
         done: p.done,
-        complete: p.done === p.total,
         eta: p.eta,
+        rate: p.rate,
       };
-      const total = progressValues.reduce(
+      const totalProgress = progressValues.reduce(
         (prev, current) => prev + current.done,
         0
       );
+      const totalRate = progressValues.reduce(
+        (prev, current) => prev + current.rate,
+        0
+      );
       const maxEta = Math.round(Math.max(...progressValues.map((v) => v.eta)));
-      const completedChunks = progressValues.filter((v) => v.complete).length;
-      progressBar.update(bToRoundedMB(total), { maxEta, completedChunks });
+      progressBar.update(bToRoundedMB(totalProgress), {
+        maxEta: secondsToTimeString(maxEta),
+        rate: bToRoundedMb(totalRate),
+      });
     })
   );
 
