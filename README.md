@@ -1,3 +1,7 @@
-# template-node-cli
+# archaeologist
 
-I use this to start Node.js CLI/server-side projects.
+Download single [archive.org](https://archive.org) files fast from your terminal.
+
+## Usage
+
+TBD

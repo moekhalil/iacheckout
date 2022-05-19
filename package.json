@@ -1,8 +1,8 @@
 {
-  "name": "template-node-cli",
+  "name": "archaeologist",
   "version": "1.0.0",
-  "description": "personal template for node.js cli/server apps",
-  "main": "index.js",
+  "description": "quick downloader for archive.org files",
+  "main": "src/index.ts",
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "build": "tsc --build"
