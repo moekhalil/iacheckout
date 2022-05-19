@@ -4,6 +4,7 @@ import path from "path";
 import cliProgress from "cli-progress";
 import Progress from "node-fetch-progress";
 import crypto from "crypto";
+import { Messages } from "./strings";
 
 function bToRoundedMB(b: number) {
   return Math.round((b / 1e6) * 100) / 100;
@@ -18,6 +19,7 @@ function secondsToTimeString(seconds: number) {
 }
 
 interface ProgressValue {
+  total: number;
   done: number;
   eta: number;
   rate: number;
@@ -33,7 +35,7 @@ interface ItemFileMetadata {
 async function main() {
   const url = process.argv[2];
   if (!url) {
-    console.error("Please provide a URL.");
+    console.error(Messages.ErrorValidUrl);
     process.exit();
   }
   let urlObj: URL | undefined;
@@ -41,17 +43,17 @@ async function main() {
   try {
     urlObj = new URL(url);
   } catch (err) {
-    console.error("Please enter a valid URL.");
+    console.error(Messages.ErrorValidUrl);
     process.exit();
   }
 
   if (!urlObj) {
-    console.error("Please enter a valid URL.");
+    console.error(Messages.ErrorValidUrl);
     process.exit();
   }
 
   if (urlObj.hostname !== "archive.org") {
-    console.error("Please provide a valid archive.org URL.");
+    console.error(Messages.ErrorValidUrl);
     process.exit();
   }
 
@@ -63,7 +65,7 @@ async function main() {
   const extMatch = filename.match(fileExtensionRegex);
 
   if (!extMatch) {
-    console.error("Please provide a valid archive.org file URL.");
+    console.error(Messages.ErrorValidUrl);
     process.exit();
   }
 
@@ -116,38 +118,47 @@ async function main() {
     fetch(url, { headers: { range } })
   );
   const progressValues: ProgressValue[] = [];
-  await (
-    await Promise.all(chunkResponses)
-  ).map((res, i) =>
-    new Progress(res, { throttle: 500 }).on("progress", (p) => {
-      progressValues[i] = {
-        done: p.done,
-        eta: p.eta,
-        rate: p.rate,
-      };
-      const totalProgress = progressValues.reduce(
-        (prev, current) => prev + current.done,
-        0
-      );
-      const totalRate = progressValues.reduce(
-        (prev, current) => prev + current.rate,
-        0
-      );
-      const maxEta = Math.round(Math.max(...progressValues.map((v) => v.eta)));
-      progressBar.update(bToRoundedMB(totalProgress), {
-        maxEta: secondsToTimeString(maxEta),
-        rate: bToRoundedMb(totalRate),
-      });
-    })
-  );
 
-  const chunkPromises = await (
-    await Promise.all(chunkResponses)
-  ).map((res) => res.arrayBuffer());
-  const buffers = await Promise.all(chunkPromises);
-  progressBar.stop();
-  buffers.forEach((buf) => fs.appendFileSync(filepath, Buffer.from(buf)));
-  console.log("Download complete. Verifying file integrity...");
+  try {
+    await (
+      await Promise.all(chunkResponses)
+    ).map((res, i) =>
+      new Progress(res, { throttle: 500 }).on("progress", (p) => {
+        progressValues[i] = {
+          total: p.total,
+          done: p.done,
+          eta: p.eta,
+          rate: p.rate,
+        };
+        const totalProgress = progressValues.reduce(
+          (prev, current) => prev + current.done,
+          0
+        );
+        const totalRate = progressValues
+          .filter((pv) => pv.done !== pv.total)
+          .reduce((prev, current) => prev + current.rate, 0);
+        const maxEta = Math.round(
+          Math.max(...progressValues.map((v) => v.eta))
+        );
+        progressBar.update(bToRoundedMB(totalProgress), {
+          maxEta: secondsToTimeString(maxEta),
+          rate: bToRoundedMb(totalRate),
+        });
+      })
+    );
+
+    const chunkPromises = await (
+      await Promise.all(chunkResponses)
+    ).map((res) => res.arrayBuffer());
+    const buffers = await Promise.all(chunkPromises);
+    progressBar.stop();
+    buffers.forEach((buf) => fs.appendFileSync(filepath, Buffer.from(buf)));
+    console.log(Messages.DownloadComplete);
+  } catch (err) {
+    progressBar.stop();
+    console.error("Download failed for unknown reason. Please try again.");
+    process.exit();
+  }
 
   const itemFilesMetadataResponse = await fetch(
     `https://archive.org/metadata/${itemname}/files`
@@ -157,18 +168,14 @@ async function main() {
     await itemFilesMetadataResponse.json();
 
   if (!itemFilesMetadata || !itemFilesMetadataResponse.ok) {
-    console.error(
-      "Unable to download verification data. Skipping verification."
-    );
+    console.error(Messages.ErrorVerificationData);
     process.exit();
   }
 
   const correctFile = itemFilesMetadata.result.find((f) => f.name === filename);
 
   if (!correctFile) {
-    console.error(
-      "Unable to download verification data. Skipping verification."
-    );
+    console.error(Messages.ErrorVerificationData);
     process.exit();
   }
 
@@ -180,9 +187,10 @@ async function main() {
   fileStream.on("close", () => {
     const isValidHash = metadataHash === fileHash.digest("hex");
     if (isValidHash) {
-      console.log("SHA-1 checksums match! Complete.");
+      console.log(Messages.VerificationHash);
+      console.log(`Saved to ${filepath}.`);
     } else {
-      console.error("Unable to verify downloaded file.");
+      console.error(Messages.ErrorVerificationHash);
     }
     process.exit();
   });

@@ -1,11 +1,16 @@
 {
-  "name": "archaeologist",
+  "name": "iacheckout",
   "version": "1.0.0",
   "description": "quick downloader for archive.org files",
   "main": "src/index.ts",
+  "preferGlobal": true,
+  "bin": {
+    "iacheckout": "./bin/iacheckout"
+  },
   "scripts": {
     "start": "ts-node ./src/index.ts",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "postinstall": "npm run build"
   },
   "author": "vphoebe",
   "license": "UNLICENSED",
