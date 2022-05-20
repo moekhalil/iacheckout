@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "cli-progress": "^3.11.1",
+    "commander": "^9.2.0",
     "node-fetch": "^2.6.7",
     "node-fetch-progress": "^1.0.2"
   }
