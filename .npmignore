@@ -1,7 +1,6 @@
-.github
-node_modules
-src
-tsconfig.json
+.github/
+src/
 .gitignore
 .eslintrc.js
 .prettierrc.json
+tsconfig.json
