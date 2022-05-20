@@ -1,6 +1,6 @@
 {
   "name": "iacheckout",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "quick downloader for archive.org files",
   "main": "src/index.ts",
   "preferGlobal": true,
