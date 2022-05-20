@@ -1,6 +1,6 @@
 # iacheckout
 
-Download single [archive.org](https://archive.org) files fast from your terminal. Splits downloads into multiple (configurable) parts to speed things up significantly.
+Download single [archive.org](https://archive.org) files fast from your terminal. Splits downloads into multiple (configurable) parts to speed things up significantly. Verifies the hash of the file when complete, against the metadata provided by archive.org.
 
 ## Installation
 
