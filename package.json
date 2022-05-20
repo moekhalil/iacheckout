@@ -2,7 +2,7 @@
   "name": "iacheckout",
   "version": "1.0.4",
   "description": "quick downloader for archive.org files",
-  "main": "src/index.ts",
+  "main": "./lib/iacheckout",
   "preferGlobal": true,
   "bin": {
     "iacheckout": "./bin/iacheckout"
@@ -11,7 +11,10 @@
     "start": "ts-node ./src/index.ts",
     "build": "tsc --build"
   },
-  "author": "vphoebe",
+  "author": {
+    "name": "Nick Seman",
+    "url": "https://github.com/vphoebe"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/vphoebe/iacheckout.git"
