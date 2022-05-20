@@ -1,6 +1,6 @@
 {
   "name": "iacheckout",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "quick downloader for archive.org files",
   "main": "src/index.ts",
   "preferGlobal": true,
@@ -9,8 +9,7 @@
   },
   "scripts": {
     "start": "ts-node ./src/index.ts",
-    "build": "tsc --build",
-    "postinstall": "npm run build"
+    "build": "tsc --build"
   },
   "author": "vphoebe",
   "license": "UNLICENSED",
