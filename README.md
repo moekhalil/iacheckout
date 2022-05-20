@@ -24,6 +24,8 @@ $ iacheckout [options] <url>
 
 ## Usage
 
+The downloaded file will be saved in your current directory.
+
 ```console
 Usage: iacheckout [options] <url>
 
@@ -41,4 +43,4 @@ Options:
 
 Right now, iacheckout doesn't support downloading files that require logging into archive.org. This will be added in a future update.
 
-I'm also looking into the best way to set it up to download multiple files simulataneously. It will probably be via a list file so you don't have to paste a million URLs into the terminal.
+I'm also looking into the best way to set it up to download multiple files simultaneously. It will probably be via a list file so you don't have to paste a million URLs into the terminal.
