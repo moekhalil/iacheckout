@@ -1,6 +1,6 @@
 {
   "name": "iacheckout",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "quick downloader for archive.org files",
   "main": "./lib/iacheckout",
   "preferGlobal": true,
@@ -27,6 +27,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/cli-progress": "^3.11.0",
     "@types/node": "^17.0.34",
     "@types/node-fetch": "^2.6.1",
