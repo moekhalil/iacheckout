@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "ts-node ./src/index.ts",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "dev": "npm start -- https://archive.org/download/Apollo1116mmOnboardFilm/apollo11_6_1_512kb.mp4"
   },
   "author": {
     "name": "Nick Seman",

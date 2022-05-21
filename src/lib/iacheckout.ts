@@ -1,24 +1,21 @@
-import crypto from "crypto";
-import fs from "fs";
-import fetch from "node-fetch";
+import fs, { PathLike } from "fs";
 import path from "path";
 
 import { downloadUrl } from "./downloadUrl";
 import { parseUrl } from "./parseUrl";
-import { Messages } from "./strings";
+import { verifyDownload } from "./verifyDownload";
 
-interface ItemFileMetadata {
-  name: string;
-  source: string;
-  size: string;
-  sha1: string;
+export function endProgram(filepath: PathLike) {
+  console.log(`Saved to ${filepath}.`);
+  process.exit();
 }
 
 async function iacheckout(url: string, options: Record<string, string>) {
-  const { chunkcount } = options;
+  const { chunkcount, skipVerification } = options;
 
+  const shouldSkipVerification = Boolean(skipVerification);
   const parsedUrl = parseUrl(url);
-  const { itemname, filename } = parsedUrl;
+  const { filename } = parsedUrl;
 
   const filepath = path.resolve(".", filename);
   if (fs.existsSync(filepath)) {
@@ -27,43 +24,14 @@ async function iacheckout(url: string, options: Record<string, string>) {
   }
 
   const parsedChunkCount = parseInt(chunkcount ?? "200");
-
   await downloadUrl(parsedUrl, parsedChunkCount, filepath);
 
-  const itemFilesMetadataResponse = await fetch(
-    `https://archive.org/metadata/${itemname}/files`
-  );
-
-  const itemFilesMetadata: { result: ItemFileMetadata[] } =
-    await itemFilesMetadataResponse.json();
-
-  if (!itemFilesMetadata || !itemFilesMetadataResponse.ok) {
-    console.error(Messages.ErrorVerificationData);
-    process.exit();
+  if (!shouldSkipVerification) {
+    await verifyDownload(parsedUrl, filepath);
+  } else {
+    console.log("File verification skipped.");
+    endProgram(filepath);
   }
-
-  const correctFile = itemFilesMetadata.result.find((f) => f.name === filename);
-
-  if (!correctFile) {
-    console.error(Messages.ErrorVerificationData);
-    process.exit();
-  }
-
-  const metadataHash = correctFile.sha1;
-
-  const fileStream = fs.createReadStream(filepath);
-  const fileHash = crypto.createHash("sha1");
-  fileStream.on("data", (data) => fileHash.update(data));
-  fileStream.on("close", () => {
-    const isValidHash = metadataHash === fileHash.digest("hex");
-    if (isValidHash) {
-      console.log(Messages.VerificationHash);
-      console.log(`Saved to ${filepath}.`);
-    } else {
-      console.error(Messages.ErrorVerificationHash);
-    }
-    process.exit();
-  });
 }
 
 export default iacheckout;

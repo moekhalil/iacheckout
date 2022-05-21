@@ -4,7 +4,6 @@ import fetch from "node-fetch";
 import Progress from "node-fetch-progress";
 
 import { ParsedUrl } from "./parseUrl";
-import { Messages } from "./strings";
 import { bToRoundedMB, secondsToTimeString, bToRoundedMb } from "./util";
 
 interface ProgressValue {
@@ -103,7 +102,6 @@ async function downloadUrl(
     const buffers = await Promise.all(chunkPromises);
     progressBar.stop();
     buffers.forEach((buf) => fs.appendFileSync(filepath, Buffer.from(buf)));
-    console.log(Messages.DownloadComplete);
   } catch (err) {
     progressBar.stop();
     console.error("Download failed for unknown reason. Please try again.");
