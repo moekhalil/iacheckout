@@ -1,11 +1,17 @@
 import { Command } from "commander";
 
+import { configure } from "./configure";
 import iacheckout from "./iacheckout";
 import { readConfigFile } from "./lib/configFile";
 
 async function main() {
   const program = new Command();
   const config = readConfigFile();
+
+  program
+    .command("configure")
+    .description("Configure authentication and directories")
+    .action(() => configure());
 
   program
     .name("iacheckout")

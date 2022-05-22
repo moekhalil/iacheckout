@@ -24,6 +24,7 @@ async function setAuth(config: ConfigObject) {
   setConfigFile({ ...config, email });
   await setPassword("iacheckout", email, password);
   console.log("Configuration updated!");
+  configure();
 }
 
 async function setCustomDownloadDir(config: ConfigObject) {
@@ -40,6 +41,7 @@ async function setCustomDownloadDir(config: ConfigObject) {
   }
   setConfigFile({ ...config, downloadDir: expandedPath });
   console.log("Configuration updated!");
+  configure();
 }
 
 async function setDownloadDir(config: ConfigObject) {
@@ -67,10 +69,11 @@ async function setDownloadDir(config: ConfigObject) {
   } else {
     setConfigFile({ ...config, downloadDir: "./" });
     console.log("Configuration updated!");
+    configure();
   }
 }
 
-function configure() {
+export function configure() {
   const config = readConfigFile();
   const initialQuestion = {
     type: "list",
@@ -85,6 +88,10 @@ function configure() {
         name: `Set default download directory (currently ${config.downloadDir})`,
         value: "setDownloadDir",
       },
+      {
+        name: "Exit configuration",
+        value: "exit",
+      },
     ],
   };
   inquirer.prompt([initialQuestion]).then((answer) => {
@@ -94,9 +101,7 @@ function configure() {
     } else if (intent === "setDownloadDir") {
       setDownloadDir(config);
     } else {
-      console.error("Something went wrong, please try again.");
+      process.exit();
     }
   });
 }
-
-configure();
