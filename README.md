@@ -24,23 +24,35 @@ $ iacheckout [options] <url>
 
 ## Usage
 
-The downloaded file will be saved in your current directory.
+The downloaded file will be saved in your current directory by default.
+
+If you want to download to another directory, or want to allow `iacheckout` to download files from archive.org that require authentication, run:
 
 ```console
-Usage: iacheckout [options] <url>
+iacheckout configure
+```
+
+`iacheckout` stores your archive.org password in your system's keychain. On requests, it will query for your S3 access keys for archive.org to download authentication-required files.
+
+## Help command
+
+```console
+Usage: iacheckout [options] [command] <url>
 
 Download archive.org files from the terminal
 
 Arguments:
-  url                        Valid archive.org download URL
+  url                              Valid archive.org download URL
 
 Options:
-  -c, --chunkcount <number>  Number of concurrent downloads that the file is split into (default: "200")
-  -h, --help                 display help for command
+  -chunks, --chunk-count <number>  Number of concurrent downloads that the file is split into (default: "200")
+  -skip, --skip-verification       Skip hash verification against archive.org metadata (default: false)
+  -h, --help                       display help for command
+
+Commands:
+  configure                        Configure authentication and directories
 ```
 
 ## Coming soon
 
-Right now, iacheckout doesn't support downloading files that require logging into archive.org. This will be added in a future update.
-
-I'm also looking into the best way to set it up to download multiple files simultaneously. It will probably be via a list file so you don't have to paste a million URLs into the terminal.
+I'm looking into the best way to allow downloading multiple files simultaneously. It will probably be via a list file so you don't have to paste a million URLs into the terminal.
