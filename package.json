@@ -10,7 +10,8 @@
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "build": "tsc --build",
-    "dev": "npm start -- https://archive.org/download/Apollo1116mmOnboardFilm/apollo11_6_1_512kb.mp4"
+    "dev": "npm start -- https://archive.org/download/Apollo1116mmOnboardFilm/apollo11_6_1_512kb.mp4",
+    "dev:configure": "ts-node ./src/configure.ts"
   },
   "author": {
     "name": "Nick Seman",
@@ -30,6 +31,8 @@
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/cli-progress": "^3.11.0",
+    "@types/inquirer": "^8.2.1",
+    "@types/keytar": "^4.4.2",
     "@types/node": "^17.0.34",
     "@types/node-fetch": "^2.6.1",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
@@ -42,6 +45,8 @@
   "dependencies": {
     "cli-progress": "^3.11.1",
     "commander": "^9.2.0",
+    "inquirer": "^8.2.4",
+    "keytar": "^7.9.0",
     "node-fetch": "^2.6.7",
     "node-fetch-progress": "^1.0.2"
   }

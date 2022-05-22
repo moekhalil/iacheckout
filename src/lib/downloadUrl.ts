@@ -3,6 +3,7 @@ import fs, { PathLike } from "fs";
 import fetch from "node-fetch";
 import Progress from "node-fetch-progress";
 
+import { getAuth } from "./getAuth";
 import { ParsedUrl } from "./parseUrl";
 import { bToRoundedMB, secondsToTimeString, bToRoundedMb } from "./util";
 
@@ -19,8 +20,12 @@ async function downloadUrl(
   filepath: PathLike
 ) {
   const { url, filename } = parsedUrl;
+  const auth = await getAuth();
+  const authHeader = auth ? `LOW ${auth.access}:${auth.secret}` : "";
 
-  const initialResponse = await fetch(url);
+  const initialResponse = await fetch(url, {
+    headers: { authorization: authHeader },
+  });
 
   if (!initialResponse.ok) {
     console.error(`Unable to download ${filename}.`);
@@ -67,7 +72,7 @@ async function downloadUrl(
   });
 
   const chunkResponsePromises = rangeValues.map((range) =>
-    fetch(url, { headers: { range } })
+    fetch(url, { headers: { range, authorization: authHeader } })
   );
   const progressValues: ProgressValue[] = [];
 
@@ -89,7 +94,11 @@ async function downloadUrl(
           .filter((pv) => pv.done !== pv.total)
           .reduce((prev, current) => prev + current.rate, 0);
         const maxEta = Math.round(
-          Math.max(...progressValues.map((v) => v.eta))
+          Math.max(
+            ...progressValues
+              .map((v) => v.eta)
+              .filter((v) => typeof v === "number")
+          )
         );
         progressBar.update(bToRoundedMB(totalProgress), {
           maxEta: secondsToTimeString(maxEta),

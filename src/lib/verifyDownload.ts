@@ -3,7 +3,7 @@ import { PathLike } from "fs";
 import fs from "fs";
 import fetch from "node-fetch";
 
-import { endProgram } from "./iacheckout";
+import { endProgram } from "../iacheckout";
 import { ParsedUrl } from "./parseUrl";
 import { Messages } from "./strings";
 
